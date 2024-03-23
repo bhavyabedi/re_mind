@@ -15,15 +15,12 @@ class NewReminderScreen extends ConsumerStatefulWidget {
 class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
   TimeOfDay selectedTime = TimeOfDay.now();
   var isTimeSelected = false;
-  String? selectedTitle;
+  Day? selectedDay;
   Activity? selectedActivity;
-  final _titleController = TextEditingController();
   void _saveReminder(Reminder newReminder) {
-    selectedTitle = _titleController.text;
-
     ref
         .read(reminderProvider.notifier)
-        .addReminder(selectedTitle!, selectedTime, selectedActivity!);
+        .addReminder(selectedDay!, selectedTime, selectedActivity!);
 
     Navigator.of(context).pop();
   }
@@ -47,8 +44,7 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
   }
 
   void _validateSubmit() {
-    if (selectedTitle == null ||
-        selectedTitle!.trim().isEmpty == true ||
+    if (selectedDay == null ||
         selectedTime == TimeOfDay.now() ||
         selectedActivity == null) {
       // print(selectedTitle);
@@ -64,7 +60,7 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
     }
     _saveReminder(
       Reminder(
-          title: selectedTitle!,
+          day: selectedDay!,
           targetTime: selectedTime,
           activity: selectedActivity!),
     );
@@ -72,7 +68,6 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
 
   @override
   void dispose() {
-    _titleController.dispose();
     super.dispose();
   }
 
@@ -87,15 +82,26 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           child: Column(
             children: [
-              TextFormField(
-                controller: _titleController,
-                maxLength: 20,
-                decoration: const InputDecoration(
-                  label: Text('Title..'),
+              SizedBox(
+                height: 30,
+                child: DropdownButtonFormField(
+                  decoration: const InputDecoration(
+                    label: Text('Select Day'),
+                  ),
+                  items: Day.values
+                      .map(
+                        (Day day) => DropdownMenuItem<Day>(
+                          value: day,
+                          child: Text(
+                            day.name.toString().toUpperCase(),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    selectedDay = value;
+                  },
                 ),
-                onChanged: (value) {
-                  selectedTitle = value;
-                },
               ),
               const SizedBox(
                 height: 24,

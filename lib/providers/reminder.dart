@@ -15,54 +15,61 @@ class ReminderNotifier extends StateNotifier<List<Reminder>> {
         dbPath,
         'reminder.db',
       ),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE userReminders(title TEXT, targetTime TEXT, activity TEXT)',
+      onCreate: (db, version) async {
+        return await db.execute(
+          'CREATE TABLE userReminders(day TEXT, targetTime TEXT, activity TEXT)',
         );
       },
       version: 1,
     );
+    print(db.path);
     return db;
   }
 
-  Activity enumFromString(String value) {
-    return Activity.values.firstWhere(
-      (e) => e.toString().split('.').last == value,
-    );
-  }
+  // Activity enumFromString(String value) {
+  //   return Activity.values.firstWhere(
+  //     (e) => e.toString().split('.').last == value,
+  //   );
+  // }
+
+  // TimeOfDay stringToTimeOfDay(String tod) {
+  //   final format = DateFormat.jm(); //"6:00 AM"
+  //   return TimeOfDay.fromDateTime(format.parse(tod));
+  // }
 
   Future<void> loadReminders() async {
     final db = await _getDatabase();
-    final data = await db.query('userReminders');
-    final reminders = data
+    final data = await db.rawQuery('SELECT * FROM userReminders');
+
+    print(data);
+    final dataList = data.toList();
+    List<Reminder> reminders = [];
+    reminders = data
         .map(
           (row) => Reminder(
-            title: row['title'] as String,
-            targetTime: TimeOfDay.fromDateTime(
-              DateTime.parse(
-                row['targetTime'].toString(),
-              ),
-            ),
-            activity: enumFromString(row['activity'].toString()),
+            day: row['day'] as Day,
+            targetTime: row['targetTime'] as TimeOfDay,
+            activity: row['activity'] as Activity,
           ),
         )
         .toList();
+    print(data.isEmpty);
     state = reminders;
-    // print(reminders);
   }
 
-  void addReminder(String title, TimeOfDay time, Activity activity) async {
+  Future closeDB() async {
+    final db = await _getDatabase();
+    db.close();
+  }
+
+  void addReminder(Day day, TimeOfDay time, Activity activity) async {
     // final appDir = await syspath.getApplicationCacheDirectory();
     final db = await _getDatabase();
     final newReminder =
-        Reminder(title: title, targetTime: time, activity: activity);
-    print(newReminder);
+        Reminder(day: day, targetTime: time, activity: activity);
     try {
-      await db.insert('userReminders', {
-        'title': title,
-        'targetTime': time.toString(),
-        'activity': activity.toString(),
-      });
+      await db.rawInsert(
+          'INSERT INTO userReminders(day , targetTime, activity) VALUES("${day.toString()}", "${time.toString()}", "${activity.toString()}")');
       state = [
         newReminder,
         ...state,

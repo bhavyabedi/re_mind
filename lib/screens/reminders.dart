@@ -21,6 +21,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 
   @override
+  void dispose() {
+    ref.read(reminderProvider.notifier).closeDB();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userReminders = ref.watch(reminderProvider);
 

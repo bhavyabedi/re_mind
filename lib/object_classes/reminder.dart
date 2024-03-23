@@ -11,14 +11,24 @@ enum Activity {
   sleep,
 }
 
+enum Day {
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday,
+}
+
 class Reminder {
   const Reminder({
-    required this.title,
+    required this.day,
     required this.targetTime,
     required this.activity,
   });
 
-  final String title;
+  final Day day;
   final TimeOfDay targetTime;
   final Activity activity;
 }

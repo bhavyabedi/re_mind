@@ -26,7 +26,7 @@ class ReminderList extends StatelessWidget {
                 title: Row(
                   children: [
                     Text(
-                      reminders[index].title,
+                      reminders[index].day.toString(),
                     ),
                     const Spacer(),
                     Text(
