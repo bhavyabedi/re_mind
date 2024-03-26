@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:re_mind/providers/reminder.dart';
 import 'package:re_mind/screens/new_reminder.dart';
-import 'package:re_mind/widgets/reminder_list.dart';
+import 'package:re_mind/widgets/day_list.dart';
 
 class RemindersScreen extends ConsumerStatefulWidget {
   const RemindersScreen({super.key});
@@ -16,8 +16,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
   @override
   void initState() {
-    super.initState();
     _remindersFuture = ref.read(reminderProvider.notifier).loadReminders();
+    super.initState();
   }
 
   @override
@@ -32,7 +32,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reminders'),
+        title: const Text(
+          'Days',
+          style: TextStyle(fontSize: 35, color: Colors.white),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
       ),
       body: FutureBuilder(
         future: _remindersFuture,
@@ -42,19 +46,15 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               child: CircularProgressIndicator(),
             );
           } else {
-            return ReminderList(
+            return DayList(
               reminders: userReminders,
             );
           }
         },
       ),
-      bottomNavigationBar: IconButton(
-        padding: const EdgeInsets.only(bottom: 24, right: 24),
-        alignment: Alignment.bottomRight,
-        icon: const Icon(
-          Icons.add_circle_outline_sharp,
-          size: 45,
-        ),
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(

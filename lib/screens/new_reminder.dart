@@ -75,19 +75,33 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add a Reminder:'),
+        title: const Text(
+          'Add a Reminder:',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
       ),
-      body: Form(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 30,
-                child: DropdownButtonFormField(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.secondary,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Form(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            child: Column(
+              children: [
+                DropdownButtonFormField(
                   decoration: const InputDecoration(
-                    label: Text('Select Day'),
-                  ),
+                      label: Text(
+                    'Select Day',
+                  )),
                   items: Day.values
                       .map(
                         (Day day) => DropdownMenuItem<Day>(
@@ -102,64 +116,76 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
                     selectedDay = value;
                   },
                 ),
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      _getTime();
-                    },
-                    icon: const Icon(Icons.alarm_add_outlined),
-                    label: isTimeSelected
-                        ? Text(
-                            (selectedTime.toString()).substring(10, 15),
-                          )
-                        : const Text('Schedule a reminder'),
-                  ),
-                  Expanded(
-                    child: DropdownButtonFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Select Activity'),
+                const SizedBox(
+                  height: 24,
+                ),
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {
+                        _getTime();
+                      },
+                      icon: const Icon(
+                        Icons.alarm_add_outlined,
+                        color: Colors.white,
                       ),
-                      items: Activity.values
-                          .map(
-                            (Activity activity) => DropdownMenuItem<Activity>(
-                              value: activity,
-                              child: Text(
-                                activity.name.toString().toUpperCase(),
+                      label: isTimeSelected
+                          ? Text(
+                              (selectedTime.toString()).substring(10, 15),
+                            )
+                          : const Text(
+                              'Time',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
                               ),
                             ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        selectedActivity = value;
-                      },
                     ),
-                  )
-                ],
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              Row(
-                children: [
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _validateSubmit,
-                    child: const Text('Submit'),
-                  ),
-                ],
-              )
-            ],
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                      child: DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Select Activity'),
+                        ),
+                        items: Activity.values
+                            .map(
+                              (Activity activity) => DropdownMenuItem<Activity>(
+                                value: activity,
+                                child: Text(
+                                  activity.name.toString().toUpperCase(),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          selectedActivity = value;
+                        },
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                Row(
+                  children: [
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: _validateSubmit,
+                      child: const Text('Submit'),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

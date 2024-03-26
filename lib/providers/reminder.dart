@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:re_mind/object_classes/reminder.dart';
 import 'package:riverpod/riverpod.dart';
@@ -22,39 +23,46 @@ class ReminderNotifier extends StateNotifier<List<Reminder>> {
       },
       version: 1,
     );
-    print(db.path);
     return db;
   }
 
-  // Activity enumFromString(String value) {
-  //   return Activity.values.firstWhere(
-  //     (e) => e.toString().split('.').last == value,
-  //   );
-  // }
+  Day dayFromString(String value) {
+    return Day.values.firstWhere(
+      (e) => e.toString() == value,
+    );
+  }
 
-  // TimeOfDay stringToTimeOfDay(String tod) {
-  //   final format = DateFormat.jm(); //"6:00 AM"
-  //   return TimeOfDay.fromDateTime(format.parse(tod));
-  // }
+  Activity activityFromString(String value) {
+    return Activity.values.firstWhere(
+      (e) => e.toString() == value,
+    );
+  }
+
+  TimeOfDay stringToTimeOfDay(String tod) {
+    final format = DateFormat.Hm();
+    return TimeOfDay.fromDateTime(format.parse(tod));
+  }
 
   Future<void> loadReminders() async {
     final db = await _getDatabase();
-    final data = await db.rawQuery('SELECT * FROM userReminders');
-
-    print(data);
-    final dataList = data.toList();
+    final data = await db.query('userReminders');
     List<Reminder> reminders = [];
-    reminders = data
-        .map(
-          (row) => Reminder(
-            day: row['day'] as Day,
-            targetTime: row['targetTime'] as TimeOfDay,
-            activity: row['activity'] as Activity,
-          ),
-        )
-        .toList();
-    print(data.isEmpty);
-    state = reminders;
+    try {
+      reminders = data
+          .map(
+            (row) => Reminder(
+              day: dayFromString(data[0]['day'].toString()),
+              targetTime: stringToTimeOfDay(data[0]['targetTime'].toString()),
+              activity: activityFromString(data[0]['activity'].toString()),
+            ),
+          )
+          .toList();
+
+      state = reminders;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
   }
 
   Future closeDB() async {
@@ -63,13 +71,13 @@ class ReminderNotifier extends StateNotifier<List<Reminder>> {
   }
 
   void addReminder(Day day, TimeOfDay time, Activity activity) async {
-    // final appDir = await syspath.getApplicationCacheDirectory();
     final db = await _getDatabase();
     final newReminder =
         Reminder(day: day, targetTime: time, activity: activity);
     try {
       await db.rawInsert(
-          'INSERT INTO userReminders(day , targetTime, activity) VALUES("${day.toString()}", "${time.toString()}", "${activity.toString()}")');
+          'INSERT INTO userReminders(day , targetTime, activity) VALUES("${day.toString()}", "${time.toString().substring(10, 15)}", "${activity.toString()}")');
+
       state = [
         newReminder,
         ...state,
