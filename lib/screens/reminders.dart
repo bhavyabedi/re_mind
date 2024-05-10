@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:re_mind/providers/reminder.dart';
 import 'package:re_mind/screens/new_reminder.dart';
+import 'package:re_mind/services/notification.dart';
 import 'package:re_mind/widgets/day_list.dart';
 
 class RemindersScreen extends ConsumerStatefulWidget {
@@ -13,9 +14,11 @@ class RemindersScreen extends ConsumerStatefulWidget {
 
 class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   late Future<void> _remindersFuture;
+  NotificationService notificationService = NotificationService();
 
   @override
   void initState() {
+    notificationService.intializeNotifications();
     _remindersFuture = ref.read(reminderProvider.notifier).loadReminders();
     super.initState();
   }
@@ -56,6 +59,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
         onPressed: () {
+          notificationService.sendNotification();
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const NewReminderScreen(),

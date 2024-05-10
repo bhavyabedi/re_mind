@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:re_mind/object_classes/reminder.dart';
 
-class ReminderList extends StatelessWidget {
+class ReminderList extends ConsumerStatefulWidget {
   const ReminderList({
     super.key,
     required this.reminders,
@@ -11,13 +12,18 @@ class ReminderList extends StatelessWidget {
   final List<Reminder> reminders;
 
   @override
+  ConsumerState<ReminderList> createState() => _ReminderListState();
+}
+
+class _ReminderListState extends ConsumerState<ReminderList> {
+  @override
   Widget build(BuildContext context) {
-    Widget body = reminders.isEmpty
+    Widget body = widget.reminders.isEmpty
         ? const Center(
             child: Text('No Reminders Stored...'),
           )
         : ListView.builder(
-            itemCount: reminders.length,
+            itemCount: widget.reminders.length,
             itemBuilder: (context, index) => Dismissible(
               key: ValueKey(index),
               onDismissed: (direction) {},
@@ -36,28 +42,27 @@ class ReminderList extends StatelessWidget {
                 title: Row(
                   children: [
                     Text(
-                      reminders[index]
-                          .day
+                      widget.reminders[index].day
                           .toString()
                           .substring(4)
                           .toUpperCase(),
                     ),
                     const Spacer(),
                     Text(
-                      reminders[index].activity.toString().substring(9),
+                      widget.reminders[index].activity.toString().substring(9),
                       style: const TextStyle(fontSize: 18),
                     ),
                   ],
                 ),
                 subtitle: Text(
-                  'For : ${reminders[index].targetTime.toString().substring(10, 15)}',
+                  'For : ${widget.reminders[index].targetTime.toString().substring(10, 15)}',
                 ),
               ),
             ),
           );
     return Scaffold(
       appBar: AppBar(
-        title: Text('Reminders for $day'),
+        title: Text('Reminders for ${widget.day}'),
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
       ),
       body: Container(
